@@ -11,7 +11,7 @@ import org.romanzhula.user_service.models.User;
 import org.romanzhula.user_service.models.enums.UserRole;
 import org.romanzhula.user_service.repositories.UserRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +30,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final RabbitTemplate rabbitTemplate;
     private final CommonJWTService jwtService;
-    private final AuthenticationManager authenticationManager;
+    private final ReactiveAuthenticationManager authenticationManager;
 
 
     public Mono<AuthResponse> userRegistration(RegistrationRequest registrationRequest) {
@@ -48,7 +48,7 @@ public class AuthenticationService {
         return transactionalOperator.execute(status ->
                 userRepository.save(newUser)
                         .doOnSuccess(user -> rabbitTemplate.convertAndSend("user-created-queue", user))
-                        .map(savedUser -> {
+                        .flatMap(savedUser -> {
                             var userDetails = new UserDetailsImpl(
                                     savedUser.getId().toString(),
                                     savedUser.getUsername(),
@@ -56,16 +56,14 @@ public class AuthenticationService {
                                     List.of(savedUser.getRole().name())
                             );
 
-                            var jwtToken = jwtService.generateToken(userDetails);
-
-                            return AuthResponse.builder()
-                                    .token(jwtToken)
-                                    .build()
-                            ;
+                            return jwtService.generateToken(userDetails) // Повертає Mono<String>
+                                    .map(jwtToken -> AuthResponse.builder()
+                                            .token(jwtToken)
+                                            .build()
+                                    );
                         })
                         .doOnError(error -> status.setRollbackOnly())
-                )
-        ;
+        ).single();
     }
 
 
@@ -80,9 +78,9 @@ public class AuthenticationService {
                 .cast(Authentication.class)
                 .map(authentication -> (UserDetailsImpl) authentication.getPrincipal())
                 .flatMap(userDetails -> {
-                    String jwtToken = jwtService.generateToken(userDetails);
+                    String jwtToken = String.valueOf(jwtService.generateToken(userDetails));
                     return Mono.just(AuthResponse.builder()
-                            .token(jwtToken)
+                            .token(String.valueOf(jwtToken))
                             .build())
                     ;
                 })
