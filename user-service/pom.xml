@@ -38,6 +38,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.projectreactor.rabbitmq</groupId>
+			<artifactId>reactor-rabbitmq</artifactId>
+			<version>1.5.6</version>
+		</dependency>
 
 		<!-- Reactive Data Access -->
 		<dependency>
@@ -70,9 +75,8 @@
 
 		<!-- Eureka Client -->
 		<dependency>
-			<groupId>io.projectreactor.rabbitmq</groupId>
-			<artifactId>reactor-rabbitmq</artifactId>
-			<version>1.5.6</version>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 
 		<!-- DevTools -->
@@ -115,12 +119,6 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
 			<version>2.6.0</version>
-		</dependency>
-
-		<!-- Feign Client -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
 		<!-- Microservices Common -->
