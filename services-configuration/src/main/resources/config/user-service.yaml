@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+  r2dbc:
+    url: r2dbc:postgresql://localhost/user_serv_db
+    username: postgres
+    password: YOUR_PASSWORD
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+  devtools:
+    restart:
+      enabled: true
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka/
