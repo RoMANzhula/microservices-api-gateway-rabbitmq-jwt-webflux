@@ -1,7 +1,7 @@
 package org.romanzhula.user_service.services;
 
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 import org.romanzhula.microservices_common.security.implementations.UserDetailsImpl;
 import org.romanzhula.microservices_common.security.jwt.CommonJWTService;
 import org.romanzhula.user_service.controllers.requests.LoginRequest;
@@ -13,7 +13,6 @@ import org.romanzhula.user_service.repositories.UserRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
@@ -22,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthenticationService {
 
@@ -56,7 +56,7 @@ public class AuthenticationService {
                                     List.of(savedUser.getRole().name())
                             );
 
-                            return jwtService.generateToken(userDetails) // Повертає Mono<String>
+                            return jwtService.generateToken(userDetails)
                                     .map(jwtToken -> AuthResponse.builder()
                                             .token(jwtToken)
                                             .build()
@@ -68,22 +68,22 @@ public class AuthenticationService {
 
 
     public Mono<AuthResponse> login(LoginRequest loginRequest) {
-        return Mono
-                .justOrEmpty(authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                loginRequest.getUsername(),
-                                loginRequest.getPassword()
-                        )
-                ))
-                .cast(Authentication.class)
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                );
+
+        return authenticationManager.authenticate(authenticationToken)
                 .map(authentication -> (UserDetailsImpl) authentication.getPrincipal())
                 .flatMap(userDetails -> {
-                    String jwtToken = String.valueOf(jwtService.generateToken(userDetails));
-                    return Mono.just(AuthResponse.builder()
-                            .token(String.valueOf(jwtToken))
-                            .build())
-                    ;
-                })
+                    return jwtService.generateToken(userDetails)
+                            .map(token -> AuthResponse.builder()
+                                    .token(token)
+                                    .build())
+                            ;
+                    }
+                )
         ;
     }
 
