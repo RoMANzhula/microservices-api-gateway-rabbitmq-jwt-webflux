@@ -1,14 +1,12 @@
 package org.romanzhula.user_service.controllers.requests;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class LoginRequest {
 
     private String username;
