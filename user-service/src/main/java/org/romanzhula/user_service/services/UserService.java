@@ -1,7 +1,7 @@
 package org.romanzhula.user_service.services;
 
 import lombok.RequiredArgsConstructor;
-import org.romanzhula.user_service.controllers.responses.UserFeignResponse;
+import org.romanzhula.user_service.controllers.responses.UserDataResponse;
 import org.romanzhula.user_service.controllers.responses.UserResponse;
 import org.romanzhula.user_service.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -47,9 +47,9 @@ public class UserService {
     }
 
 
-    public Mono<UserFeignResponse> getUserByUsername(String username) {
+    public Mono<UserDataResponse> getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(user -> new UserFeignResponse(
+                .map(user -> new UserDataResponse(
                         user.getId().toString(),
                         user.getUsername(),
                         user.getPassword(),
