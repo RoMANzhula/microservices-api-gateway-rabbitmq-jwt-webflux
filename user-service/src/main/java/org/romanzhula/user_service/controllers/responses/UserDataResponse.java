@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserFeignResponse {
+public class UserDataResponse {
 
     private String id;
     private String username;
