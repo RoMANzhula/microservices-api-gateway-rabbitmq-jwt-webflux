@@ -29,9 +29,11 @@ public class AuthEntryPointJwt implements ServerAuthenticationEntryPoint {
         body.put("message", authException.getMessage());
         body.put("path", exchange.getRequest().getPath().value());
 
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                .bufferFactory().wrap(body.toString().getBytes()))
+        return exchange.getResponse().writeWith(
+                Mono.just(exchange.getResponse()
+                        .bufferFactory()
+                        .wrap(body.toString().getBytes())
+                )
         );
     }
-
 }
