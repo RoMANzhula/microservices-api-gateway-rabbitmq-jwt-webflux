@@ -1,14 +1,15 @@
 package org.romanzhula.microservices_common.security.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.romanzhula.microservices_common.exceptions.InvalidTokenException;
+import org.romanzhula.microservices_common.security.jwt.interfaces.TokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -16,79 +17,85 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 @Service
-public class CommonJWTService {
+public class CommonJWTService implements TokenProvider {
 
-    @Value("${app.jwt_secret_code}")
-    private String jwtSecretCode;
+    private final String jwtSecretCode;
+    private final Instant issuedAt = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+    private final Instant expiration = issuedAt.plus(2, ChronoUnit.HOURS);
 
-    private final String secretKey;
 
-    public CommonJWTService(String secret) {
-        this.secretKey = jwtSecretCode;
+    public CommonJWTService(@Value("${app.jwt_secret_code}") String jwtSecretCode) {
+        this.jwtSecretCode = jwtSecretCode;
     }
 
 
-    public Mono<String> generateToken(UserDetails userDetails) {
-        Instant issuedAt = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant expiration = issuedAt.plus(2, ChronoUnit.HOURS);
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
 
         String token = Jwts.builder()
+                .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList()))
+                        .map(role -> "ROLE_" + role)
+                        .toArray())
                 .issuedAt(Date.from(issuedAt))
                 .expiration(Date.from(expiration))
                 .signWith(getSecretKey())
                 .compact()
         ;
 
-        return Mono.just(token);
+        return token;
+    }
+
+    String extractUsername(String jwt) {
+        return extractClaim(jwt, Claims::getSubject);
+    }
+
+    List<String> extractRoles(String jwt) {
+        return extractClaim(jwt, claims -> (List<String>) claims.get("roles"));
+    }
+
+
+    boolean isTokenValid(String jwt) {
+        return !isTokenExpired(jwt);
+    }
+
+    private boolean isTokenExpired(String jwt) {
+        return extractClaim(jwt, Claims::getExpiration).before(new Date());
+    }
+
+    private <T> T extractClaim(String jwt, Function<Claims, T> claimResolver) {
+        Claims claims = extractAllClaims(jwt);
+
+        return claimResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String jwt) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSecretKey())
+                    .build()
+                    .parseSignedClaims(jwt)
+                    .getPayload()
+            ;
+        } catch (JwtException e) {
+            throw new InvalidTokenException(e.getMessage());
+        }
     }
 
     private SecretKey getSecretKey() {
         return Keys.hmacShaKeyFor(jwtSecretCode.getBytes());
     }
 
-    public Mono<String> extractUsernameFromToken(String jwtToken) {
-        try {
-            return Mono.just(extractClaim(jwtToken, Claims::getSubject));
-        } catch (Exception e) {
-            return Mono.error(new InvalidTokenException("Failed to extract username from JWT token"));
-        }
-    }
-
-    public <T> T extractClaim(String jwtToken, Function<Claims, T> function) {
-        Claims claims = extractAllClaims(jwtToken);
-        return function.apply(claims);
-    }
-
-    public Claims extractAllClaims(String jwtToken) {
-        return Jwts.parser()
-                .verifyWith(getSecretKey())
-                .build()
-                .parseSignedClaims(jwtToken)
-                .getPayload()
-        ;
-    }
-
-    public Mono<Boolean> isTokenValid(String jwtToken, String username) {
-        return extractUsernameFromToken(jwtToken)
-                .map(usernameFromToken -> usernameFromToken.equals(username) && !isTokenExpired(jwtToken))
-                .defaultIfEmpty(false)
-        ;
-    }
-
-    private boolean isTokenExpired(String jwtToken) {
-        return extractExpiration(jwtToken).before(new Date());
-    }
-
-    private Date extractExpiration(String jwtToken) {
-        return extractClaim(jwtToken, Claims::getExpiration);
+    @Override
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(Map.of(), userDetails);
     }
 
 }
