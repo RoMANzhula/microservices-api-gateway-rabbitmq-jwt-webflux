@@ -17,21 +17,19 @@ spring:
           loverCaseServiceId: true
       routes:
         - id: user-service
-          uri: http://localhost:8081
+          uri: lb://user-service
           predicates:
             - Path=/api/v1/**
-          filters:
-            - AuthJWTFilter
         - id: wallet-service
-          uri: http://localhost:8082
+          uri: lb://wallet-service
           predicates:
             - Path=/api/v1/wallets/**
         - id: journal-service
-          uri: http://localhost:8083
+          uri: lb://journal-service
           predicates:
             - Path=/api/v1/journals/**
         - id: expenses-service
-          uri: http://localhost:8084
+          uri: lb://expenses-service
           predicates:
             - Path=/api/v1/expenses/**
 
