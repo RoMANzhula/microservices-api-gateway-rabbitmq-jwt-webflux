@@ -1,21 +1,21 @@
 package org.romanzhula.api_gateway_settings.configurations;
 
 import lombok.RequiredArgsConstructor;
-import org.romanzhula.api_gateway_settings.services.CustomUserDetailsServiceImpl;
 import org.romanzhula.microservices_common.cors.CorsAutoConfiguration;
 import org.romanzhula.microservices_common.cors.CorsConfigurationProperties;
 import org.romanzhula.microservices_common.security.jwt.AuthEntryPointJwt;
-import org.romanzhula.microservices_common.security.jwt.AuthJWTFilter;
 import org.romanzhula.microservices_common.security.jwt.CommonJWTService;
+import org.romanzhula.microservices_common.security.jwt.JwtAuthenticationManager;
+import org.romanzhula.microservices_common.security.jwt.JwtServerAuthenticationConverter;
 import org.romanzhula.microservices_common.utils.UserServiceWebClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.web.reactive.function.client.WebClient;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -43,27 +43,6 @@ public class GatewayConfig {
         return new BCryptPasswordEncoder(8);
     }
 
-    @Bean
-    public ReactiveAuthenticationManager reactiveAuthenticationManager(
-            CustomUserDetailsServiceImpl userDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
-        UserDetailsRepositoryReactiveAuthenticationManager manager =
-                new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService)
-        ;
-
-        manager.setPasswordEncoder(passwordEncoder);
-
-        return manager;
-    }
-
-    @Bean
-    public AuthJWTFilter authJWTFilter(
-            CommonJWTService jwtService,
-            CustomUserDetailsServiceImpl userDetailsService
-    ) {
-        return new AuthJWTFilter(jwtService, userDetailsService);
-    }
 
     @Bean
     public AuthEntryPointJwt authEntryPointJwt() {
@@ -83,6 +62,16 @@ public class GatewayConfig {
     @Bean
     public CorsConfigurationProperties properties() {
         return new CorsConfigurationProperties();
+    }
+
+    @Bean
+    public JwtAuthenticationManager authenticationManager() {
+        return new JwtAuthenticationManager(commonJWTService());
+    }
+
+    @Bean
+    public ServerAuthenticationConverter converter() {
+        return new JwtServerAuthenticationConverter(commonJWTService());
     }
 
 }
