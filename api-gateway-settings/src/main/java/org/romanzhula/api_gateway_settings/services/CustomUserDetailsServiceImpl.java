@@ -1,10 +1,8 @@
 package org.romanzhula.api_gateway_settings.services;
 
 import lombok.RequiredArgsConstructor;
-import org.romanzhula.microservices_common.dto.UserResponse;
 import org.romanzhula.microservices_common.utils.UserServiceWebClient;
-import org.romanzhula.microservices_common.security.CustomUserDetailsService;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
+public class CustomUserDetailsServiceImpl implements ReactiveUserDetailsService {
 
     private final UserServiceWebClient userServiceWebClient;
 
