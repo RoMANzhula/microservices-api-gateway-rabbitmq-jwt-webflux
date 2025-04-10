@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.romanzhula.microservices_common.security.jwt.CommonJWTService;
 import org.romanzhula.microservices_common.security.jwt.interfaces.TokenProvider;
+import org.romanzhula.user_service.configurations.security.implementations.UserDetailsImpl;
 import org.romanzhula.user_service.controllers.requests.LoginRequest;
 import org.romanzhula.user_service.controllers.requests.RegistrationRequest;
 import org.romanzhula.user_service.controllers.responses.AuthResponse;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 
 @Service
@@ -51,23 +54,23 @@ public class AuthenticationService {
                 userRepository.save(newUser)
                         .doOnSuccess(user -> rabbitTemplate.convertAndSend("user-created-queue", user))
                         .flatMap(savedUser -> {
-                            User userDetails = User.builder()
-                                    .username(savedUser.getUsername())
-                                    .password(savedUser.getPassword())
-                                    .role(UserRole.USER)
-                                    .build()
+                            UserDetailsImpl userDetails =
+                                    new UserDetailsImpl(
+                                            savedUser.getId().toString(),
+                                            savedUser.getUsername(),
+                                            savedUser.getPassword(),
+                                            List.of(savedUser.getRole().name())
+                                    )
                             ;
 
-                            String jwtToken = jwtService.generateToken((UserDetails) userDetails);
+                            String jwtToken = jwtService.generateToken(userDetails);
 
                             return Mono.just(AuthResponse.builder()
                                     .token(jwtToken)
-                                    .build())
-                            ;
+                                    .build());
                         })
                         .doOnError(error -> status.setRollbackOnly())
-                ).single()
-        ;
+        ).single();
     }
 
 
