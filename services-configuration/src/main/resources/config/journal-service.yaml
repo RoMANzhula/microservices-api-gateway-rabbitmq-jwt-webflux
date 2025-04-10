@@ -5,13 +5,20 @@ spring:
   application:
     name: journal-service
   r2dbc:
-    url: r2dbc:postgresql://localhost/journal_serv_db
+    url: r2dbc:postgresql://localhost:/journal_serv_db
     username: postgres
     password: YOUR_PASSWORD
   data:
     r2dbc:
       repositories:
         enabled: true
+  flyway:
+    url: jdbc:postgresql://localhost:5432/journal_serv_db
+    user: postgres
+    password: YOUR_PASSWORD
+    baseline-on-migrate: true
+    enabled: true
+    locations: classpath:db/migration
   devtools:
     restart:
       enabled: true
