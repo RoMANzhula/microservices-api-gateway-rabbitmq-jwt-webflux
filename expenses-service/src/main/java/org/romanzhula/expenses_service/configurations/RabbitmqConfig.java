@@ -1,6 +1,7 @@
 package org.romanzhula.expenses_service.configurations;
 
 import lombok.Getter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +46,11 @@ public class RabbitmqConfig {
         connectionFactory.setHost(host);
 
         return connectionFactory;
+    }
+
+    @Bean
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 
 }
