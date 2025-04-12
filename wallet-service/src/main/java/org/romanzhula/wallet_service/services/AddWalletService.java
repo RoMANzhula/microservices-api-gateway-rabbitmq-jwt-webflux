@@ -9,6 +9,8 @@ import org.romanzhula.wallet_service.configurations.RabbitmqConfig;
 import org.romanzhula.wallet_service.models.User;
 import org.romanzhula.wallet_service.models.Wallet;
 import org.romanzhula.wallet_service.repositories.WalletRepository;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.rabbitmq.Receiver;
@@ -18,13 +20,17 @@ import java.math.BigDecimal;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AddWalletService {
+public class AddWalletService implements ApplicationListener<ContextRefreshedEvent> {
 
     private final Receiver receiver;
     private final RabbitmqConfig rabbitmqConfig;
     private final WalletRepository walletRepository;
     private final ObjectMapper objectMapper;
 
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        startListening();
+    }
 
     public void startListening() {
         consumeMessages();
@@ -56,9 +62,7 @@ public class AddWalletService {
         wallet.setUserId(user.getId());
         wallet.setBalance(BigDecimal.valueOf(0.0));
 
-        log.info("Creating wallet for user: {}", user.getUsername());
-
-        return walletRepository.save(wallet)
+        return walletRepository.saveWallet(user.getId(), BigDecimal.valueOf(0.0))
                 .doOnSuccess(savedWallet -> log.info("Wallet created for user: {}", user.getUsername()))
                 .then()
         ;
