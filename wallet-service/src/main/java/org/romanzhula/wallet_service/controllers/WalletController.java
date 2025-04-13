@@ -19,7 +19,7 @@ public class WalletController {
 
     private final WalletService walletService;
 
-
+    // TODO: add access only ADMIN
     @GetMapping("/all")
     public Mono<ResponseEntity<Flux<CommonWalletResponse>>> getAll() {
         Flux<CommonWalletResponse> wallets = walletService.getAllWallets();
@@ -27,6 +27,7 @@ public class WalletController {
         return Mono.just(ResponseEntity.ok(wallets));
     }
 
+    // TODO: add access only CURRENT USER and ADMIN
     @GetMapping("/{wallet-id}")
     public Mono<ResponseEntity<CommonWalletResponse>> getWalletById(
             @PathVariable("wallet-id") UUID walletId
@@ -37,6 +38,7 @@ public class WalletController {
         ;
     }
 
+    // TODO: add access only CURRENT USER and ADMIN
     @GetMapping("/{wallet-id}/balance")
     public Mono<ResponseEntity<WalletBalanceResponse>> getBalanceByWalletId(
             @PathVariable("wallet-id") UUID walletId
@@ -47,6 +49,7 @@ public class WalletController {
         ;
     }
 
+    // TODO: add access only CURRENT USER
     @PostMapping("/up-balance")
     public Mono<ResponseEntity<String>> replenishBalance(
             @RequestBody BalanceOperationEvent balanceOperationEvent
@@ -57,6 +60,7 @@ public class WalletController {
         ;
     }
 
+    // TODO: add access only CURRENT USER
     @PatchMapping("/deduct-balance")
     public Mono<ResponseEntity<String>> deductBalance(
             @RequestBody BalanceOperationEvent balanceOperationEvent
