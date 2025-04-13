@@ -1,0 +1,44 @@
+How to check by Postman
+
+1. Register new user (during new registration our wallet-service create new wallet)
+    POST    http://localhost:8081/api/v1/auth/register
+    Body data:
+    {
+      "username": "admin",
+      "password": "123",
+      "email": "testuser1@example.com",
+      "firstName": "Jjj",
+      "lastName": "Jjj",
+      "phone": "+1234567892"
+    }
+
+    Get token:
+    {
+        "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfUk9MRV9VU0VSIl0sImlhdCI6MTc0NDQ4NTU3MSwiZXhwIjoxNzQ0NDkyNzcxfQ.AwS0QvGxPfV0eH2T9NEviZHyPZ_P8VE5A5wZoJDlbOk3KYnwcytHfCqd3FUUM6H_hUW2PrFpyFbyZAFOk5REKg"
+    }
+
+2. Update balance on a wallet by user_id:
+    POST    http://localhost:8082/api/v1/wallets/up-balance
+    Add to HEADERS:
+        Content-Type    application/json
+        Authorization   Bearer here_our_token
+    Body
+    {
+        "userId": "830b0b9e-5b76-49c7-8ea3-02688219224b",
+        "amount": 1000
+    }
+
+    Get:
+    Balance replenished successfully.
+
+3. Get balance:
+    GET     http://localhost:8082/api/v1/wallets/830b0b9e-5b76-49c7-8ea3-02688219224b
+    Add to HEADERS:
+        Content-Type    application/json
+        Authorization   Bearer here_our_token
+
+    Get:
+    {
+        "userId": "830b0b9e-5b76-49c7-8ea3-02688219224b",
+        "balance": 1000.00
+    }
