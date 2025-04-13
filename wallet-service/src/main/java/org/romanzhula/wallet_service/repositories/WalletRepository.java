@@ -16,6 +16,11 @@ public interface WalletRepository extends ReactiveCrudRepository<Wallet, UUID> {
 
     @Modifying
     @Query("UPDATE wallets SET balance = :balance WHERE wallet_id = :walletId")
-    Mono<Void> saveWallet(@Param("walletId") UUID walletId, @Param("balance") BigDecimal balance);
+    Mono<Void> updateWallet(@Param("walletId") UUID walletId, @Param("balance") BigDecimal balance);
+
+
+    @Modifying
+    @Query("INSERT INTO wallets (wallet_id, balance) VALUES (:userId, :balance)")
+    Mono<Void> saveWallet(@Param("userId") UUID userId, @Param("balance") BigDecimal balance);
 
 }
