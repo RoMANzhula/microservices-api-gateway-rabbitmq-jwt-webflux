@@ -6,6 +6,7 @@ import org.romanzhula.wallet_service.responses.CommonWalletResponse;
 import org.romanzhula.wallet_service.responses.WalletBalanceResponse;
 import org.romanzhula.wallet_service.services.WalletService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,7 +20,7 @@ public class WalletController {
 
     private final WalletService walletService;
 
-    // TODO: add access only ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public Mono<ResponseEntity<Flux<CommonWalletResponse>>> getAll() {
         Flux<CommonWalletResponse> wallets = walletService.getAllWallets();
@@ -27,7 +28,7 @@ public class WalletController {
         return Mono.just(ResponseEntity.ok(wallets));
     }
 
-    // TODO: add access only CURRENT USER and ADMIN
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{wallet-id}")
     public Mono<ResponseEntity<CommonWalletResponse>> getWalletById(
             @PathVariable("wallet-id") UUID walletId
@@ -38,7 +39,7 @@ public class WalletController {
         ;
     }
 
-    // TODO: add access only CURRENT USER and ADMIN
+    @PreAuthorize("hasAuthority('ROLE_ADMIN','ROLE_USER')")
     @GetMapping("/{wallet-id}/balance")
     public Mono<ResponseEntity<WalletBalanceResponse>> getBalanceByWalletId(
             @PathVariable("wallet-id") UUID walletId
@@ -49,7 +50,7 @@ public class WalletController {
         ;
     }
 
-    // TODO: add access only CURRENT USER
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PostMapping("/up-balance")
     public Mono<ResponseEntity<String>> replenishBalance(
             @RequestBody BalanceOperationEvent balanceOperationEvent
@@ -60,7 +61,7 @@ public class WalletController {
         ;
     }
 
-    // TODO: add access only CURRENT USER
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PatchMapping("/deduct-balance")
     public Mono<ResponseEntity<String>> deductBalance(
             @RequestBody BalanceOperationEvent balanceOperationEvent
