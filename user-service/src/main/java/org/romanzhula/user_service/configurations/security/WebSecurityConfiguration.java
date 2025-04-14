@@ -42,6 +42,7 @@ public class WebSecurityConfiguration {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(
                                 "/api/v1/auth/**",
+                                "/api/v1/users/by-username",
                                 "/img/**",
                                 "/css/**",
                                 "/js/**"
