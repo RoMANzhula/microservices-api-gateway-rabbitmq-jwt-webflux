@@ -40,7 +40,7 @@ public class WalletService {
         return getCurrentUserId().flatMap(currentUserId ->
                 walletRepository.findById(walletId)
                         .flatMap(wallet -> {
-                            if (!wallet.getUserId().toString().equals(currentUserId)) {
+                            if (wallet.getUserId() == null || !wallet.getUserId().toString().equals(currentUserId)) {
                                 return Mono.error(new SecurityException("Access denied to wallet with id: " + walletId));
                             }
                             return Mono.just(new CommonWalletResponse(wallet.getUserId(), wallet.getBalance()));
@@ -56,7 +56,7 @@ public class WalletService {
         return getCurrentUserId().flatMap(currentUserId ->
                 walletRepository.findById(walletId)
                         .flatMap(wallet -> {
-                            if (!wallet.getUserId().toString().equals(currentUserId)) {
+                            if (wallet.getUserId() == null || !wallet.getUserId().toString().equals(currentUserId)) {
                                 return Mono.error(new SecurityException("Access denied to wallet with id: " + walletId));
                             }
                             return Mono.just(new WalletBalanceResponse(wallet.getBalance()));
@@ -72,7 +72,7 @@ public class WalletService {
         validateBalanceReplenishRequest(event);
 
         return getCurrentUserId().flatMap(currentUserId -> {
-            if (!event.getUserId().equals(currentUserId)) {
+            if (event.getUserId() == null || !event.getUserId().toString().equals(currentUserId)) {
                 return Mono.error(new SecurityException("You are not allowed to replenish this wallet."));
             }
 
@@ -100,7 +100,7 @@ public class WalletService {
         validateDeductionRequest(event);
 
         return getCurrentUserId().flatMap(currentUserId -> {
-            if (!event.getUserId().toString().equals(currentUserId)) {
+            if (event.getUserId() == null || !event.getUserId().toString().equals(currentUserId)) {
                 return Mono.error(new SecurityException("You are not allowed to deduct from this wallet."));
             }
 
