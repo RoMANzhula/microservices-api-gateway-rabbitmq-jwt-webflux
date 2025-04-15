@@ -1,0 +1,31 @@
+How to check by Postman
+
+1. Register new user (during new registration our wallet-service create new wallet)
+    POST    http://localhost:8081/api/v1/auth/register
+    Body data:
+    {
+      "username": "admin",
+      "password": "123",
+      "email": "testuser1@example.com",
+      "firstName": "Jjj",
+      "lastName": "Jjj",
+      "phone": "+1234567892"
+    }
+
+    Get token:
+    {
+        "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfUk9MRV9VU0VSIl0sImlhdCI6MTc0NDQ4NTU3MSwiZXhwIjoxNzQ0NDkyNzcxfQ.AwS0QvGxPfV0eH2T9NEviZHyPZ_P8VE5A5wZoJDlbOk3KYnwcytHfCqd3FUUM6H_hUW2PrFpyFbyZAFOk5REKg"
+    }
+
+2. Login user:
+    POST localhost:8081/api/v1/auth/login
+    Body:
+    {
+      "username": "rom",
+      "password": "123"
+    }
+
+    Get token:
+        {
+            "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfUk9MRV9VU0VSIl0sImlhdCI6MTc0NDQ4NTU3MSwiZXhwIjoxNzQ0NDkyNzcxfQ.AwS0QvGxPfV0eH2T9NEviZHyPZ_P8VE5A5wZoJDlbOk3KYnwcytHfCqd3FUUM6H_hUW2PrFpyFbyZAFOk5REKg"
+        }
