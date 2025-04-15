@@ -1,0 +1,54 @@
+How to check by Postman
+
+1. Login user:
+       POST localhost:8081/api/v1/auth/login
+       Body:
+       {
+         "username": "rom",
+         "password": "123"
+       }
+
+       Get token:
+           {
+               "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfUk9MRV9VU0VSIl0sImlhdCI6MTc0NDQ4NTU3MSwiZXhwIjoxNzQ0NDkyNzcxfQ.AwS0QvGxPfV0eH2T9NEviZHyPZ_P8VE5A5wZoJDlbOk3KYnwcytHfCqd3FUUM6H_hUW2PrFpyFbyZAFOk5REKg"
+           }
+
+2. Check journal bu user(wallet) id: REMEMBER: endpoint is only allowed the USER role
+    GET http://localhost:8083/api/v1/journal/547c38eb-c59f-44f8-ad68-da2a9646eaba
+
+    Add to HEADERS:
+            Content-Type    application/json
+            Authorization   Bearer here_our_token
+
+    Get body:
+    [
+        {
+            "id": 2,
+            "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+            "description": "Operation replenish: +444, account balance: 444.00",
+            "createdAt": "2025-04-15T16:09:45.962829"
+        }
+    ]
+
+3. Check journal bu user(wallet) id: REMEMBER: endpoint is only allowed the ADMIN role
+       GET http://localhost:8083/api/v1/journal/547c38eb-c59f-44f8-ad68-da2a9646eaba
+
+       Add to HEADERS:
+               Content-Type    application/json
+               Authorization   Bearer here_our_token
+
+       Get body:
+       [
+           {
+               "id": 1,
+               "userId": "830b0b9e-5b76-49c7-8ea3-02688219224b",
+               "description": "Operation replenish: +1000, account balance: 1000.00",
+               "createdAt": "2025-04-15T16:09:45.812828"
+           },
+           {
+               "id": 2,
+               "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+               "description": "Operation replenish: +444, account balance: 444.00",
+               "createdAt": "2025-04-15T16:09:45.962829"
+           }
+       ]
