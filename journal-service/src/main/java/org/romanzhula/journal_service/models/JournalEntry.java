@@ -17,6 +17,7 @@ import java.util.UUID;
 @Table("journal_entries")
 public class JournalEntry {
 
+    @Id
     private Long id;
 
     private UUID userId;
