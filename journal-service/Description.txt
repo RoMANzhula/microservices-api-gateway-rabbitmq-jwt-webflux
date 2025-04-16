@@ -13,7 +13,7 @@ How to check by Postman
                "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfUk9MRV9VU0VSIl0sImlhdCI6MTc0NDQ4NTU3MSwiZXhwIjoxNzQ0NDkyNzcxfQ.AwS0QvGxPfV0eH2T9NEviZHyPZ_P8VE5A5wZoJDlbOk3KYnwcytHfCqd3FUUM6H_hUW2PrFpyFbyZAFOk5REKg"
            }
 
-2. Check journal bu user(wallet) id: REMEMBER: endpoint is only allowed the USER role
+2. Check journal by user(wallet) id: REMEMBER: endpoint is only allowed the USER role
     GET http://localhost:8083/api/v1/journal/547c38eb-c59f-44f8-ad68-da2a9646eaba
 
     Add to HEADERS:
@@ -30,8 +30,8 @@ How to check by Postman
         }
     ]
 
-3. Check journal bu user(wallet) id: REMEMBER: endpoint is only allowed the ADMIN role
-       GET http://localhost:8083/api/v1/journal/547c38eb-c59f-44f8-ad68-da2a9646eaba
+3. Check all journals: REMEMBER: endpoint is only allowed the ADMIN role
+       GET http://localhost:8083/api/v1/journal/all
 
        Add to HEADERS:
                Content-Type    application/json
