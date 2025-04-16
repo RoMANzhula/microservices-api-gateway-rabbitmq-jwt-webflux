@@ -1,0 +1,77 @@
+How to check by Postman
+
+1. Login user:
+       POST localhost:8081/api/v1/auth/login
+       Body:
+       {
+         "username": "rom",
+         "password": "123"
+       }
+
+       Get token:
+           {
+               "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfUk9MRV9VU0VSIl0sImlhdCI6MTc0NDQ4NTU3MSwiZXhwIjoxNzQ0NDkyNzcxfQ.AwS0QvGxPfV0eH2T9NEviZHyPZ_P8VE5A5wZoJDlbOk3KYnwcytHfCqd3FUUM6H_hUW2PrFpyFbyZAFOk5REKg"
+           }
+
+2. Update balance on a wallet by user_id:
+    POST    http://localhost:8082/api/v1/wallets/up-balance
+    Add to HEADERS:
+        Content-Type    application/json
+        Authorization   Bearer here_our_token
+    Body
+    {
+        "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+        "amount": 1000
+    }
+
+    Get:
+    Balance replenished successfully.
+
+3. Deduct balance on a wallet by user_id (= wallet_id):
+    PATCH   http://localhost:8082/api/v1/wallets/deduct-balance
+    Add to HEADERS:
+            Content-Type    application/json
+            Authorization   Bearer here_our_token
+    Body
+    {
+        "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+        "amount": 3.5
+    }
+
+    Get:
+    Your balance successfully deducted!
+
+4. Get all expenses by user id (current user or admin):
+    GET     http://localhost:8084/api/v1/expenses/547c38eb-c59f-44f8-ad68-da2a9646eaba
+
+    Add to HEADERS:
+                Content-Type    application/json
+                Authorization   Bearer here_our_token
+
+    Get:
+    [
+        {
+            "id": 1,
+            "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+            "title": "Wallet replenished",
+            "amount": 3.50,
+            "message": "Balance updated successfully",
+            "remainingBalance": 62.55
+        },
+        {
+            "id": 2,
+            "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+            "title": "Wallet replenished",
+            "amount": 3.50,
+            "message": "Balance updated successfully",
+            "remainingBalance": 59.05
+        },
+        {
+            "id": 3,
+            "userId": "547c38eb-c59f-44f8-ad68-da2a9646eaba",
+            "title": "Wallet replenished",
+            "amount": 3.50,
+            "message": "Balance updated successfully",
+            "remainingBalance": 55.55
+        }
+    ]
