@@ -89,7 +89,6 @@ public class WalletService {
                         );
 
                         sendDataToQueueWalletReplenished(event, description);
-                        sendDataToQueueWalletReplenishedForExpensesService(event);
                     })
                     .thenReturn("Balance replenished successfully.");
             }
@@ -111,14 +110,18 @@ public class WalletService {
                         return walletRepository.save(wallet);
                     })
                     .as(transactionalOperator::transactional)
-                    .doOnSuccess(wallet -> {
+                    .flatMap(wallet -> {
                         String description = String.format(
                                 "Operation deduct: -%s, account balance: %s",
                                 event.getAmount(), wallet.getBalance()
                         );
 
                         sendDataToQueueWalletReplenished(event, description);
+                        return sendDataToQueueWalletReplenishedForExpensesService(event)
+                                .thenReturn(wallet)
+                        ;
                     })
+
                     .thenReturn("Your balance successfully deducted!");
             }
         );
@@ -176,9 +179,9 @@ public class WalletService {
         );
     }
 
-    private void sendDataToQueueWalletReplenishedForExpensesService(BalanceOperationEvent event) {
-        getBalanceByWalletId(event.getUserId())
-                .subscribe(balance -> {
+    private Mono<Void> sendDataToQueueWalletReplenishedForExpensesService(BalanceOperationEvent event) {
+        return getBalanceByWalletId(event.getUserId())
+                .doOnNext(balance -> {
                     ExpensesResponseEvent responseEvent = new ExpensesResponseEvent(
                             event.getUserId(),
                             "Wallet replenished",
@@ -192,7 +195,7 @@ public class WalletService {
                             responseEvent
                     );
                 })
-        ;
+                .then();
     }
 
 }
