@@ -21,7 +21,7 @@ public class ExpensesController {
     private final ExpensesService expensesService;
 
 
-    @PreAuthorize("hasAnyRole('USER, ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/{user-id}")
     public Mono<ResponseEntity<Flux<ExpensesResponse>>> getAllExpensesByUserId(
             @PathVariable("user-id") String userId
