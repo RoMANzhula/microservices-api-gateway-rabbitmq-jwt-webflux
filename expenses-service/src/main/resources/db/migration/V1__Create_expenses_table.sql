@@ -4,5 +4,5 @@ CREATE TABLE expenses (
     expense_title TEXT,
     amount NUMERIC(12, 2) NOT NULL,
     message_request TEXT,
-    balance NUMERIC(12, 2) NOT NULL
+    remaining_balance NUMERIC(12, 2) NOT NULL
 );
