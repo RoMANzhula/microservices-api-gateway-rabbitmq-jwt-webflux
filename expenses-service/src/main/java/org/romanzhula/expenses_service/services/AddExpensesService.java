@@ -9,6 +9,8 @@ import org.romanzhula.expenses_service.configurations.RabbitmqConfig;
 import org.romanzhula.expenses_service.models.Expense;
 import org.romanzhula.expenses_service.models.events.ExpensesRequestEvent;
 import org.romanzhula.expenses_service.repositories.ExpensesRepository;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
@@ -18,7 +20,7 @@ import reactor.rabbitmq.Receiver;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AddExpensesService {
+public class AddExpensesService implements ApplicationListener<ContextRefreshedEvent> {
 
     private final Receiver receiver;
     private final RabbitmqConfig rabbitmqConfig;
@@ -26,6 +28,11 @@ public class AddExpensesService {
     private final ObjectMapper objectMapper;
     private final TransactionalOperator transactionalOperator;
 
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        startListening();
+    }
 
     public void startListening() {
         consumeMessages();
